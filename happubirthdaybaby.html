@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Birthday Surprise</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: "Georgia", serif;
+      overflow: hidden;
+
+      /* Background gradient animasi */
+      background: linear-gradient(135deg, #ffdde1, #ee9ca7, #e0c3fc, #8ec5fc);
+      background-size: 400% 400%;
+      animation: gradientMove 15s ease infinite;
+    }
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .app {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      height: 90vh;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,.15);
+
+      /* Background baru */
+      background: 
+        linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)),
+        url("https://i.postimg.cc/9w3DgD0j/bg.jpg");
+      background-size: cover;
+      background-position: center;
+    }
+    .screen {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      padding: 20px;
+      text-align: center;
+    }
+    .screen.active { display: flex; }
+    .btn {
+      margin-top: 20px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 30px;
+      background: #1e40af;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .letter {
+      text-align: left;
+      font-style: italic;
+      line-height: 1.8;
+      font-size: 14px;
+      max-width: 90%;
+    }
+    .letter h2 {
+      text-align: left;
+      font-style: normal;
+      font-size: 20px;
+      color: #1e3a8a;
+    }
+    .float { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .float span {
+      position: absolute;
+      animation: floaty linear infinite;
+      opacity: .7;
+    }
+    @keyframes floaty {
+      from { transform: translateY(100vh) rotate(0); }
+      to { transform: translateY(-10vh) rotate(360deg); }
+    }
+    .envelope {
+      font-size: 80px;
+      animation: shake 1s infinite;
+    }
+    @keyframes shake {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-10deg); }
+      75% { transform: rotate(10deg); }
+    }
+    img.gif {
+      width: 220px;
+      height: auto;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+    .signature {
+      text-align: right;
+      margin-top: 30px;
+      font-style: normal;
+      font-weight: bold;
+      opacity: 0;
+    }
+    .fade-in {
+      animation: fadeIn 2s ease forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="float" id="float"></div>
+
+    <!-- Step 1 -->
+    <div class="screen active" id="s1">
+      <img src="https://media3.giphy.com/media/v1.Y2lkPTZjMDliOTUyMmhyMGp4ZmJibDU2d2ptdW4yanhpcmcwZnVoa3dyNzhtZjVvemhpYSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/9rO5Aksmn0dHQKXJAu/giphy.gif" 
+           alt="Birthday Gif" class="gif">
+      <h2>Happy Birthday, Sayangkuu 🎉</h2>
+      <p>Your next surprise is just a click away</p>
+      <button class="btn" data-go="s2" id="startMusic">Next ❤</button>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="screen" id="s2">
+      <div class="envelope">✉️</div>
+      <h3>knock knock... there's something for you...</h3>
+      <button class="btn" data-go="s3" id="startTyping">Open the Letter ❤</button>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="screen" id="s3">
+      <div class="letter">
+        <h2>⭐ Dear Flaura,</h2>
+        <div id="typewriter"></div>
+        <p id="signature" class="signature">From your sweetest boy - Jaki ❤</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Musik Latar -->
+  <audio id="bgMusic" loop>
+    <source src="https://www.bensound.com/bensound-music/bensound-romantic.mp3" type="audio/mpeg">
+  </audio>
+  <!-- Suara mesin ketik -->
+  <audio id="typeSound" preload="auto">
+    <source src="https://actions.google.com/sounds/v1/office/typewriter.ogg" type="audio/ogg">
+  </audio>
+
+  <script>
+    // Navigasi
+    const go = id => {
+      document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    };
+    document.querySelectorAll('[data-go]').forEach(btn=>{
+      btn.addEventListener('click', ()=> go(btn.dataset.go));
+    });
+
+    // Floating icons
+    const float = document.getElementById('float');
+    const icons = ['💙','💖','✨','⭐'];
+    function makeFloat(){
+      const el = document.createElement('span');
+      el.textContent = icons[Math.floor(Math.random()*icons.length)];
+      el.style.left = Math.random()*100 + '%';
+      el.style.fontSize = (18 + Math.random()*20) + 'px';
+      el.style.animationDuration = (6 + Math.random()*6) + 's';
+      float.appendChild(el);
+      setTimeout(()=> el.remove(), 12000);
+    }
+    setInterval(makeFloat, 800);
+
+    // Musik mulai di Step 1 tombol
+    document.getElementById("startMusic").addEventListener("click", () => {
+      const music = document.getElementById("bgMusic");
+      music.volume = 0.15; // kecilkan biar lembut
+      music.play().catch(()=>{});
+    });
+
+    // Typewriter mulai di Step 2 tombol
+    document.getElementById("startTyping").addEventListener("click", () => {
+      startTyping();
+    });
+
+    // Isi surat
+    const paragraphs = [
+      "happy birthday to my sweetest soul! 💙",
+      "you make every moment brighter just by being you.\ni'm so grateful for your love and kindness.",
+      "wishing you a day wrapped in joy, gentle laughter, and tender moments\nthat make your heart flutter.",
+      "you mean everything to me."
+    ];
+
+    let pIndex = 0, charIndex = 0;
+    function startTyping(){
+      const container = document.getElementById("typewriter");
+      container.innerHTML = "";
+      pIndex = 0; charIndex = 0;
+      typeParagraph();
+    }
+
+    function typeParagraph(){
+      if(pIndex >= paragraphs.length){
+        document.getElementById("signature").classList.add("fade-in");
+        return;
+      }
+
+      const container = document.getElementById("typewriter");
+      if(charIndex === 0){
+        const p = document.createElement("p");
+        container.appendChild(p);
+      }
+      const currentP = container.lastChild;
+      currentP.textContent += paragraphs[pIndex].charAt(charIndex);
+
+      // Suara ketik
+      if(paragraphs[pIndex].charAt(charIndex) !== " "){
+        const typeSound = document.getElementById("typeSound").cloneNode();
+        typeSound.volume = 0.9;
+        typeSound.play().catch(()=>{});
+      }
+
+      charIndex++;
+      if(charIndex < paragraphs[pIndex].length){
+        setTimeout(typeParagraph, 60 + Math.random()*60);
+      } else {
+        pIndex++;
+        charIndex = 0;
+        setTimeout(typeParagraph, 800);
+      }
+    }
+  </script>
+</body>
+</html>
